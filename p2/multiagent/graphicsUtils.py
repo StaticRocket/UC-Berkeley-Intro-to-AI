@@ -19,10 +19,11 @@ import string
 import time
 import types
 import tkinter
+import os.path
 
 _Windows = sys.platform == 'win32'  # True if on Win95/98/NT
 
-_root_window = None      # The root window for graphics output
+_root_window = tkinter.Tk()      # The root window for graphics output
 _canvas = None      # The canvas which holds graphics
 _canvas_xs = None      # Size of canvas object
 _canvas_ys = None
@@ -214,7 +215,10 @@ def moveCircle(id, pos, r, endpoints=None):
         e = list(endpoints)
     while e[0] > e[1]: e[1] = e[1] + 360
 
-    edit(id, ('start', e[0]), ('extent', e[1] - e[0]))
+    if os.path.isfile('flag'):
+        edit(id, ('extent', e[1] - e[0]))
+    else:
+        edit(id, ('start', e[0]), ('extent', e[1] - e[0]))
     move_to(id, x0, y0)
 
 def edit(id, *args):
@@ -287,11 +291,8 @@ def _clear_keys(event=None):
     _keyswaiting = {}
     _got_release = None
 
-def keys_pressed(d_o_e=tkinter.tkinter.dooneevent,
-                 d_w=tkinter.tkinter.DONT_WAIT):
-    d_o_e(d_w)
-    if _got_release:
-        d_o_e(d_w)
+def keys_pressed(d_o_e=_root_window.dooneevent(tkinter._tkinter.DONT_WAIT),
+                 d_w=tkinter._tkinter.DONT_WAIT):
     return list(_keysdown.keys())
 
 def keys_waiting():
@@ -310,10 +311,10 @@ def wait_for_keys():
     return keys
 
 def remove_from_screen(x,
-                       d_o_e=tkinter.tkinter.dooneevent,
-                       d_w=tkinter.tkinter.DONT_WAIT):
+                       d_o_e=_root_window.dooneevent(tkinter._tkinter.DONT_WAIT),
+                       d_w=tkinter._tkinter.DONT_WAIT):
     _canvas.delete(x)
-    d_o_e(d_w)
+    
 
 def _adjust_coords(coord_list, x, y):
     for i in range(0, len(coord_list), 2):
@@ -322,8 +323,8 @@ def _adjust_coords(coord_list, x, y):
     return coord_list
 
 def move_to(object, x, y=None,
-            d_o_e=tkinter.tkinter.dooneevent,
-            d_w=tkinter.tkinter.DONT_WAIT):
+            d_o_e=_root_window.dooneevent(tkinter._tkinter.DONT_WAIT),
+            d_w=tkinter._tkinter.DONT_WAIT):
     if y is None:
         try: x, y = x
         except: raise  'incomprehensible coordinates'
@@ -341,11 +342,11 @@ def move_to(object, x, y=None,
         newCoords.append(coord + inc)
 
     _canvas.coords(object, *newCoords)
-    d_o_e(d_w)
+    
 
 def move_by(object, x, y=None,
-            d_o_e=tkinter.tkinter.dooneevent,
-            d_w=tkinter.tkinter.DONT_WAIT, lift=False):
+            d_o_e=_root_window.dooneevent(tkinter._tkinter.DONT_WAIT),
+            d_w=tkinter._tkinter.DONT_WAIT, lift=False):
     if y is None:
         try: x, y = x
         except: raise Exception('incomprehensible coordinates')
@@ -362,7 +363,7 @@ def move_by(object, x, y=None,
         newCoords.append(coord + inc)
 
     _canvas.coords(object, *newCoords)
-    d_o_e(d_w)
+    
     if lift:
         _canvas.tag_raise(object)
 
